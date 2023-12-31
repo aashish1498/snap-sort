@@ -22,5 +22,5 @@ go.work
 
 .DS_Store
 launch.json
-# files/*
+files/*
 output/*
