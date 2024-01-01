@@ -6,6 +6,8 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+
+	"github.com/schollz/progressbar/v3"
 )
 
 func main() {
@@ -25,11 +27,13 @@ func main() {
 func processMediaInDirectory(rootFolder string, outputFolder string) {
 	fileInfos, _ := os.ReadDir(rootFolder)
 	log.Println(toString(len(fileInfos)) + " files found. Processing ...")
+	bar := progressbar.Default(int64(len(fileInfos)))
 	for _, file := range fileInfos {
 		fullPath := filepath.Join(rootFolder, file.Name())
 		dateTime := GetDateTime(fullPath)
 		outputPath := filepath.Join(outputFolder, toString(dateTime.Year()), toString((int)(dateTime.Month())), toString(dateTime.Day()))
 		Copy(fullPath, outputPath)
+		bar.Add(1)
 	}
 }
 
