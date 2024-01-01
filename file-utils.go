@@ -1,19 +1,19 @@
 package main
 
 import (
-	"io"
-	"log/slog"
+	"log"
 	"os"
 	"path/filepath"
 	"time"
 
+	"github.com/h2non/filetype"
 	"github.com/rwcarlsen/goexif/exif"
 )
 
 func GetDateTime(filename string) time.Time {
 	dateTime, err := getDatetimeFromTag(filename)
 	if err != nil || dateTime.Year() < 1970 {
-		slog.Warn("Could not get get exif tags, using time from file ...")
+		log.Println(filename, "Could not get get exif tags, using time from file ...")
 		dateTime, err = GetDateTimeFromFileInfo(filename)
 	}
 	return dateTime
@@ -31,7 +31,7 @@ func GetDateTimeFromFileInfo(filename string) (time.Time, error) {
 func getDatetimeFromTag(filename string) (time.Time, error) {
 	f, err := os.Open(filename)
 	if err != nil {
-		slog.Error(err.Error())
+		log.Println(err.Error())
 	}
 	var datetime = time.Now()
 	x, err := exif.Decode(f)
@@ -41,29 +41,31 @@ func getDatetimeFromTag(filename string) (time.Time, error) {
 	return datetime, err
 }
 
-func IsHiddenFile(filename string) bool {
-	return filename[0] == '.'
+func IsValidType(fileBuffer []byte) bool {
+	return filetype.IsImage(fileBuffer) || filetype.IsVideo(fileBuffer)
+
 }
 
 func Copy(srcpath, dstFolder string) (err error) {
-	r, err := os.Open(srcpath)
-	if err != nil {
-		return err
-	}
-	defer r.Close()
 	filename := filepath.Base(srcpath)
-	os.MkdirAll(dstFolder, os.ModePerm)
-	w, err := os.Create(filepath.Join(dstFolder, filename))
-	if err != nil {
+	input, err := os.ReadFile(srcpath)
+	if err != nil || !IsValidType(input) {
+		log.Println("Skipping file: " + srcpath)
 		return err
 	}
-
-	defer func() {
-		if c := w.Close(); c != nil && err == nil {
-			err = c
-		}
-	}()
-
-	_, err = io.Copy(w, r)
+	os.MkdirAll(dstFolder, os.ModePerm)
+	destinationFile := filepath.Join(dstFolder, filename)
+	err = os.WriteFile(destinationFile, input, 0644)
 	return err
+}
+
+func exists(path string) bool {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true
+	}
+	if os.IsNotExist(err) {
+		return false
+	}
+	return false
 }

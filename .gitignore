@@ -21,6 +21,8 @@
 go.work
 
 .DS_Store
-launch.json
+.log
 files/*
+test/*
 output/*
+launch.json
