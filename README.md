@@ -3,7 +3,7 @@
 # Usage
 
 To run, use:
-```go
+```sh
 go run .
 ```
 
