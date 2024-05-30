@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"log"
 	"os"
@@ -43,12 +44,22 @@ func toString(number int) string {
 }
 
 func getPathFromUser(pathName string, defaultValue string, validate bool) string {
-	path := defaultValue
 	fmt.Print("Enter a path for " + pathName + " (" + defaultValue + "): ")
-	fmt.Scanln(&path)
+	path := scanText(defaultValue)
 	for !exists(path) && validate {
 		fmt.Print("Invalid path, please try again: ")
-		fmt.Scanln(&path)
+		path = scanText(defaultValue)
 	}
 	return path
+}
+
+func scanText(defaultValue string) string {
+	scanner := bufio.NewScanner(os.Stdin)
+	if scanner.Scan() {
+		scanned := scanner.Text()
+		if scanned != "" {
+			return scanned
+		}
+	}
+	return defaultValue
 }
