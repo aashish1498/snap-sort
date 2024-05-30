@@ -28,6 +28,7 @@ func processMediaInDirectory(rootFolder string, outputFolder string) {
 	fileInfos, _ := os.ReadDir(rootFolder)
 	log.Println(toString(len(fileInfos)) + " files found. Processing ...")
 	bar := progressbar.Default(int64(len(fileInfos)))
+
 	for _, file := range fileInfos {
 		fullPath := filepath.Join(rootFolder, file.Name())
 		dateTime := GetDateTime(fullPath)

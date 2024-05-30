@@ -9,6 +9,8 @@ go run .
 
 You will be prompted for an input directory (where your media currently is), and an output (where you want them to be stored).
 
+Files will be **copied** to the output folder to ensure originals are retained.
+
 # Output
 
 The files will be stored in folders based on their datetime in the format
